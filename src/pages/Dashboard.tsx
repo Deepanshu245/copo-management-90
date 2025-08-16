@@ -185,7 +185,7 @@ export const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">
-          Welcome back, {user?.first_name}!
+          Welcome back, {user?.username}!
         </h1>
         <p className="text-muted-foreground">
           {dashboardData.title} - Here's what's happening with your academic outcomes.

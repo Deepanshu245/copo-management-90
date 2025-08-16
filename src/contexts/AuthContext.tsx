@@ -1,13 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authService, UserProfile } from '@/services/auth';
 
 export interface User {
   id: number;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
   role: 'admin' | 'faculty' | 'hod' | 'accreditation_officer' | 'student';
-  is_active: boolean;
 }
 
 interface AuthContextType {
@@ -47,26 +45,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string) => {
     try {
-      // Mock login for demo - replace with actual API call
-      const mockUser: User = {
-        id: 1,
-        username,
-        email: `${username}@university.edu`,
-        first_name: 'John',
-        last_name: 'Doe',
-        role: username === 'admin' ? 'admin' : 'faculty',
-        is_active: true,
+      // Get tokens from Django API
+      const { access, refresh } = await authService.login({ username, password });
+      
+      // Store tokens
+      localStorage.setItem('token', access);
+      localStorage.setItem('refresh_token', refresh);
+      setToken(access);
+      
+      // Get user profile
+      const userProfile = await authService.getCurrentUser();
+      const user: User = {
+        id: userProfile.id,
+        username: userProfile.username,
+        email: userProfile.email,
+        role: userProfile.role,
       };
       
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      
-      setUser(mockUser);
-      setToken(mockToken);
-      
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      throw new Error('Invalid credentials');
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user));
+    } catch (error: any) {
+      const message = error.response?.data?.detail || error.message || 'Invalid credentials';
+      throw new Error(message);
     }
   };
 
@@ -74,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
   };
 

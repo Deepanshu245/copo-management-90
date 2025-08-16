@@ -141,7 +141,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       <div className="p-4 border-t border-sidebar-accent/20">
         {!isCollapsed && user && (
           <div className="mb-3 p-3 bg-sidebar-accent/10 rounded-lg">
-            <p className="text-sm font-medium text-sidebar-text">{user.first_name} {user.last_name}</p>
+            <p className="text-sm font-medium text-sidebar-text">{user.username}</p>
             <p className="text-xs text-sidebar-text/70 capitalize">{user.role.replace('_', ' ')}</p>
           </div>
         )}
